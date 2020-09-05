@@ -42,7 +42,7 @@ def inject_payload(jpeg, loc, payload, output):
     print("Injecting payload...")
     contents = f.read()
     pre_payload = contents[:loc + len(binascii.unhexlify(magic_number))]
-    post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(payload):]
+    post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(bin_payload):]
     fo.write(pre_payload + bin_payload + post_payload + bytes('\n', 'utf-8'))
     print("Payload written.")
 
