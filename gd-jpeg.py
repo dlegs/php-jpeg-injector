@@ -14,46 +14,44 @@ def main():
     payload_code = sys.argv[2]
     path_to_output = sys.argv[3]
 
-    magic_number_index = find_magic_number_index(path_to_vector_image)
-    inject_payload(
-        path_to_vector_image,
-        magic_number_index,
-        payload_code,
-        path_to_output)
+    with open(path_to_vector_image, 'rb') as vector_file:
+        bin_vector_data = vector_file.read()
+        magic_number_index = find_magic_number_index(bin_vector_data)
+
+        if magic_number_index >=0:
+            with open(path_to_output, 'wb') as infected_file:
+                infected_file.write(
+                    inject_payload(
+                        bin_vector_data,
+                        magic_number_index,
+                        payload_code))
 
 def find_magic_number_index(
-        jpeg_path: str) -> int:
+        data: bytes) -> int:
+    print("[ ] Searching for magic number...")
+    index = data.find(binascii.unhexlify(MAGIC_NUMBER))
 
-    print("Searching for magic number...")
-    with open(jpeg_path, 'rb') as f:
-        bin_contents = f.read()
-        bin_magic_number = binascii.unhexlify(MAGIC_NUMBER)
-        index = bin_contents.find(bin_magic_number)
-
-    if index:
-        print("Found magic number.")
-        return index
+    if index >= 0:
+        print("[+] Found magic number.")
     else:
-        print("Magic number not found. Exiting.")
-        sys.exit()
+        print("[-] Magic number not found. Exiting.")
+
+    return index
 
 def inject_payload(
-        jpeg_path: str,
+        vector: bytes,
         index: int,
-        payload: str,
-        output_path: str) -> int:
+        payload: str) -> bytes:
 
-    bin_payload = bin(int(binascii.hexlify(payload),16))
+    print("Injecting payload...")
+    bin_payload = bin(int(binascii.hexlify(payload), 16))
     bin_magic_number = binascii.unhexlify(MAGIC_NUMBER)
 
-    with open(jpeg_path, 'rb') as f:
-        with open(output_path, 'wb') as fo:
-            print("Injecting payload...")
-            bin_contents = f.read()
-            pre_payload = bin_contents[:index + len(bin_magic_number)]
-            post_payload = bin_contents[index + len(bin_magic_number) + len(payload):]
-            fo.write(pre_payload + bin_payload + post_payload + '\n')
-            print("Payload written.")
+    pre_payload = vector[:index + len(bin_magic_number)]
+    post_payload = vector[index + len(bin_magic_number) + len(bin_payload):]
+    print("Payload written.")
+
+    return (pre_payload + bin_payload + post_payload + '\n')
 
 if __name__ == "__main__":
     main()
