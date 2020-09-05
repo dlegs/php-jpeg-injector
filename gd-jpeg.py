@@ -5,11 +5,6 @@ import binascii
 MAGIC_NUMBER = "03010002110311003f00"
 
 def main():
-
-    if len(sys.argv) != 4:
-        print("USAGE: <jpeg file path> <payload code> <output path>")
-        sys.exit()
-
     path_to_vector_image = sys.argv[1]
     payload_code = sys.argv[2]
     path_to_output = sys.argv[3]
@@ -51,4 +46,7 @@ def inject_payload(
     return (pre_payload + bin_payload + post_payload + '\n')
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 4:
+        print("USAGE: <jpeg file path> <payload code> <output path>")
+    else:
+        main()
