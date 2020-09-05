@@ -21,7 +21,8 @@ def main():
         payload_code,
         path_to_output)
 
-def find_magic_number_index(jpeg_path):
+def find_magic_number_index(
+        jpeg_path: str) -> int:
 
     print("Searching for magic number...")
     with open(jpeg_path, 'rb') as f:
@@ -36,7 +37,11 @@ def find_magic_number_index(jpeg_path):
         print("Magic number not found. Exiting.")
         sys.exit()
 
-def inject_payload(jpeg_path, index, payload, output_path):
+def inject_payload(
+        jpeg_path: str,
+        index: int,
+        payload: str,
+        output_path: str) -> int:
 
     bin_payload = bin(int(binascii.hexlify(payload),16))
     bin_magic_number = binascii.unhexlify(MAGIC_NUMBER)
