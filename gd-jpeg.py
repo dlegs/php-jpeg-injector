@@ -14,10 +14,10 @@ def main():
     payload = sys.argv[2]
     output = sys.argv[3]
 
-    loc = get_loc(jpeg)
+    loc = find_injection_start_index(jpeg)
     inject_payload(jpeg, loc, payload, output)
 
-def get_loc(jpeg):
+def find_injection_start_index(jpeg):
 
     print("Searching for magic number...")
     f = open(jpeg, 'rb')
@@ -27,7 +27,7 @@ def get_loc(jpeg):
     
     if loc:
         print("Found magic number.")
-        return loc
+        return loc + len(binascii.unhexlify(magic_number))
     else:
         print("Magic number not found. Exiting.")
         sys.exit()
@@ -41,8 +41,8 @@ def inject_payload(jpeg, loc, payload, output):
     
     print("Injecting payload...")
     contents = f.read()
-    pre_payload = contents[:loc + len(binascii.unhexlify(magic_number))]
-    post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(payload):]
+    pre_payload = contents[:loc]
+    post_payload = contents[loc + len(payload):]
     fo.write(pre_payload + payload + post_payload + '\n')
     print("Payload written.")
 
