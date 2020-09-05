@@ -20,10 +20,9 @@ def main():
 def get_loc(jpeg):
 
     print("Searching for magic number...")
-    f = open(jpeg, 'rb')
-    contents = f.read()
-    loc = contents.find(binascii.unhexlify(magic_number))
-    f.close()
+    with open(jpeg, 'rb') as f:
+        contents = f.read()
+        loc = contents.find(binascii.unhexlify(magic_number))
     
     if loc:
         print("Found magic number.")
@@ -36,18 +35,14 @@ def inject_payload(jpeg, loc, payload, output):
 
     bin_payload = bin(int(binascii.hexlify(payload),16))
 
-    f = open(jpeg, 'rb')
-    fo = open(output, 'wb')
-    
-    print("Injecting payload...")
-    contents = f.read()
-    pre_payload = contents[:loc + len(binascii.unhexlify(magic_number))]
-    post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(payload):]
-    fo.write(pre_payload + payload + post_payload + '\n')
-    print("Payload written.")
-
-    f.close()
-    fo.close()
+    with open(jpeg, 'rb') as f:
+        with open(output, 'wb') as fo:
+            print("Injecting payload...")
+            contents = f.read()
+            pre_payload = contents[:loc + len(binascii.unhexlify(magic_number))]
+            post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(payload):]
+            fo.write(pre_payload + payload + post_payload + '\n')
+            print("Payload written.")
 
 if __name__ == "__main__":
     main()
