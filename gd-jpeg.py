@@ -3,6 +3,7 @@ import sys
 import binascii
 
 MAGIC_NUMBER = "03010002110311003f00"
+BIN_MAGIC_NUMBER = binascii.unhexlify(MAGIC_NUMBER)
 
 def main():
     path_to_vector_image = sys.argv[1]
@@ -30,7 +31,7 @@ def main():
 
 def find_magic_number_index(
         data: bytes) -> int:
-    return data.find(binascii.unhexlify(MAGIC_NUMBER))
+    return data.find(BIN_MAGIC_NUMBER)
 
 def inject_payload(
         vector: bytes,
@@ -38,10 +39,9 @@ def inject_payload(
         payload: str) -> bytes:
 
     bin_payload = bin(int(binascii.hexlify(payload), 16))
-    bin_magic_number = binascii.unhexlify(MAGIC_NUMBER)
 
-    pre_payload = vector[:index + len(bin_magic_number)]
-    post_payload = vector[index + len(bin_magic_number) + len(bin_payload):]
+    pre_payload = vector[:index + len(BIN_MAGIC_NUMBER)]
+    post_payload = vector[index + len(BIN_MAGIC_NUMBER) + len(bin_payload):]
 
     return (pre_payload + bin_payload + post_payload + '\n')
 
