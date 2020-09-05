@@ -34,7 +34,7 @@ def get_loc(jpeg):
 
 def inject_payload(jpeg, loc, payload, output):
 
-    bin_payload = bin(int(binascii.hexlify(payload),16))
+    bin_payload = bytes(payload, 'utf-8')
 
     f = open(jpeg, 'rb')
     fo = open(output, 'wb')
@@ -43,7 +43,7 @@ def inject_payload(jpeg, loc, payload, output):
     contents = f.read()
     pre_payload = contents[:loc + len(binascii.unhexlify(magic_number))]
     post_payload = contents[loc + len(binascii.unhexlify(magic_number)) + len(payload):]
-    fo.write(pre_payload + payload + post_payload + '\n')
+    fo.write(pre_payload + bin_payload + post_payload + bytes('\n', 'utf-8'))
     print("Payload written.")
 
     f.close()
