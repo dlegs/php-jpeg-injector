@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import binascii
+import os
 
 MAGIC_NUMBER = "03010002110311003f00"
 BIN_MAGIC_NUMBER = binascii.unhexlify(MAGIC_NUMBER)
