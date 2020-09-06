@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import binascii
+import os
 
 magic_number = "03010002110311003f00" 
 
@@ -34,7 +35,7 @@ def find_injection_start_index(jpeg):
 
 def inject_payload(jpeg, loc, payload, output):
 
-    bin_payload = bin(int(binascii.hexlify(payload),16))
+    bin_payload = bytes(payload, 'utf-8')
 
     f = open(jpeg, 'rb')
     fo = open(output, 'wb')
