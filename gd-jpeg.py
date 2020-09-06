@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 import binascii
+import os
 
 magic_number = "03010002110311003f00" 
 
@@ -15,7 +16,12 @@ def main():
     output = sys.argv[3]
 
     loc = get_loc(jpeg)
-    inject_payload(jpeg, loc, payload, output)
+
+    if os.path.exists(payload):
+        with open(payload, "r") as payload_file:
+            inject_payload(jpeg, loc, payload_file.read(), output)
+    else:
+        inject_payload(jpeg, loc, payload, output)
 
 def get_loc(jpeg):
 
