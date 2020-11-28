@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 import binascii
 import os
@@ -39,12 +39,12 @@ def inject_payload(
         index: int,
         payload: str) -> bytes:
 
-    bin_payload = bin(int(binascii.hexlify(payload), 16))
+    bin_payload = payload.encode()
 
     pre_payload = vector[:index + len(BIN_MAGIC_NUMBER)]
     post_payload = vector[index + len(BIN_MAGIC_NUMBER) + len(bin_payload):]
 
-    return (pre_payload + bin_payload + post_payload + '\n')
+    return (pre_payload + bin_payload + post_payload)
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
